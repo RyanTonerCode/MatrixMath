@@ -5,17 +5,47 @@ namespace MatrixMath
 {
     class Matrix
     {
+        public static Matrix GetIdentityMatrix(int dim)
+        {
+            Matrix I = new Matrix(dim, dim);
+            for (int i = 0; i < dim; i++)
+                I[i, i] = 1;
+            return I;
+        }
+
+        /*
+         * Linear Combinations/ Linear Dependence/ Independence
+         * 
+         * Subroutine that actually spits out x1, x2, x3 solutions to a system
+         * 
+         * Programming in augmented space somehow?
+         * 
+         * 
+         * eigenvector/ eigenvalue
+         * 
+         * dimensionality
+         * 
+         * rank
+         * 
+         * kernel
+         * 
+         * 
+         * 
+         */
+
+
         /// <summary>
         /// This is a 0-indexed indexer for the underlying matrix.
         /// </summary>
-        /// <param name="a">row index</param>
-        /// <param name="b">col index</param>
+        /// <param name="i">row index</param>
+        /// <param name="j">col index</param>
         /// <returns></returns>
-        public double this[int a, int b]
+        public double this[int i, int j]
         {
-            get => getValue(a, b);
-            internal set => MatrixArray[a, b] = value;
+            get => MatrixArray[i, j];
+            internal set => MatrixArray[i, j] = value;
         }
+
 
         /// <summary>
         /// Adds two matrices and will produce a matrix of the largest dimension possible.
@@ -67,10 +97,8 @@ namespace MatrixMath
             for (int i = 0; i < n; i++)
                 for (int j = 0; j < p; j++)
                 {
-                    double sum = 0;
                     for (int k = 0; k < m; k++)
-                        sum += left[i, k] * right[k, j];
-                    mult[i, j] = sum;
+                        mult[i, j] += left[i, k] * right[k, j];
                 }
 
             return mult;
@@ -83,8 +111,47 @@ namespace MatrixMath
 
         public bool IsSquare => Rows == Cols;
 
+        public static Matrix GetMinor(Matrix mat, int row, int col)
+        {
+            double[,] minor = new double[mat.Rows - 1, mat.Cols - 1];
+            int auxI = 0;
+            for (int i = 0; i < mat.Rows; i++) {
+                if (i == row)
+                    continue;
+                int auxj = 0;
+                for (int j = 0; j < mat.Cols; j++) {
+                    if (j == col)
+                        continue;
+                    minor[auxI, auxj] = mat[i, j];
+                    auxj++;
+                }
+                auxI++;
+            }
+            return new Matrix(minor);
+        }
+
+        public static double Determinant(Matrix mat, int expansion_row = 0)
+        {
+            if (mat.Rows == 2 && mat.Cols == 2)
+                return mat[0, 0] * mat[1, 1] - (mat[0, 1] * mat[1, 0]);
+            else if(mat.IsSquare && mat.Rows > 2)
+            {
+                double result = 0;
+                for(int i = 0; i < mat.Cols; i++)
+                {
+                    double cofactor = Math.Pow(-1, expansion_row + i) * mat[expansion_row,i];
+                    double expansion = cofactor * Determinant(GetMinor(mat, expansion_row, i));
+                    result += expansion;
+                }
+
+                return result;
+
+            }
+            throw new Exception("Invalid matrix dimensions!");
+        }
+
         //how many columns are augmented
-        public int Augmented { get; private set; }
+        public int Augmented { get; internal set; }
 
         public Matrix GetIdentityAugmented()
         {
@@ -94,6 +161,8 @@ namespace MatrixMath
             int identityStart = Cols;
             for (int i = 0; i < Cols; i++)
                 aug_matrix[i, i + identityStart] = 1;
+
+            aug_matrix.Augmented = Cols;
 
             return aug_matrix;
         }
@@ -220,7 +289,9 @@ namespace MatrixMath
 
                     sb.Append(str[i, j]);
 
-                    if (j + 1 != Cols)
+                    if (j + 1 == Augmented)
+                        sb.Append("|");
+                    else if (j + 1 != Cols)
                         sb.Append(",");
                 }
                 sb.Append("]\n");
@@ -229,82 +300,47 @@ namespace MatrixMath
             Console.WriteLine(sb);
         }
 
-        public void RowEchelonForm()
-        {
-            //go column by column
-            //process... pick pivot per column:::
+        public void ReducedRowEchelonForm(bool print = false) => RowEchelonForm(true, print);
 
-            //meaningless for rows <= 1
-            if (Rows <= 1)
-                return;
+        public void RowEchelonForm(bool rref = false, bool print = false)
+        {
+            //Process: go column by column and make leading 1-s.
+
+            StringBuilder output = new StringBuilder();
 
             for (int j = 0; j < Cols; j++)
             {
-                Console.WriteLine("COLUMN {0}", j + 1);
-                ColumnMath(j);
+                output.Append(("COLUMN {0}", j + 1)).AppendLine();
+                ColumnMath(j, rref, print);
 
-                Console.WriteLine("==========");
+                output.Append("=>").AppendLine();
 
-                Print();
+                if(print)
+                    Print();
 
-                Console.WriteLine("COLUMN FINISHED\n");
-
-            }
-            Console.WriteLine("Finished REF");
-        }
-
-        public void ReducedRowEchelonForm()
-        {
-            if (Rows <= 1)
-                return;
-
-            for (int j = 0; j < Cols; j++)
-            {
-                Console.WriteLine("COLUMN {0}", j + 1);
-                ColumnMath(j, true);
-
-                Console.WriteLine("==========");
-
-                Print();
-
-                Console.WriteLine("COLUMN FINISHED\n");
+                output.Append("COLUMN FINISHED\n").AppendLine();
 
             }
+            if (rref)
+                output.Append("Finished rref").AppendLine();
+            else
+                output.Append("Finished ref").AppendLine();
 
-            Console.WriteLine("Finished RREF");
-        }
-
-        /// <summary>
-        /// 1-indexed external getter
-        /// </summary>
-        /// <param name="i"></param>
-        /// <param name="j"></param>
-        /// <returns></returns>
-        public double GetValue(int i, int j)
-        {
-            return MatrixArray[i - 1, j - 1];
-        }
-
-        /// <summary>
-        /// 0-indexed internal getter
-        /// </summary>
-        /// <param name="i"></param>
-        /// <param name="j"></param>
-        /// <returns></returns>
-        internal double getValue(int i, int j)
-        {
-            return MatrixArray[i, j];
+            if (print)
+                Console.Write(output.ToString());
         }
 
         //start indicates which row to start on
-        private void ColumnMath(int solving_col, bool rref = false)
+        private void ColumnMath(int solving_col, bool rref = false, bool print = false)
         {
+            StringBuilder output = new StringBuilder();
+
             //pick either a 1 or the largest possible number in that column.
             int best_col_index = -1;
             double best_col_value = 0;
 
             //this method will retrieve the value of the column at the 0-based row index.
-            double get_col_val(int row) => GetValue(row + 1, solving_col + 1);
+            double get_col_val(int row) => this[row, solving_col];
 
             for (int i = solving_col; i < Rows; i++)
             {
@@ -332,7 +368,7 @@ namespace MatrixMath
                 //need to make this row a 1.
                 RowMultiplication(best_col_index + 1, inverse);
 
-                Console.WriteLine("R{0} = R{0}({1})", best_col_index + 1, inverse);
+                output.Append(("R{0} = R{0}({1})", best_col_index + 1, inverse)).AppendLine();
             }
 
             //put this row at the top of the start row
@@ -341,7 +377,10 @@ namespace MatrixMath
                 //exchange these two rows
                 RowSwap(best_col_index + 1, solving_col + 1);
 
-                Console.WriteLine("Swap R{0} with R{1}", solving_col + 1, best_col_index + 1);
+                //need to update this value
+                best_col_index = solving_col;
+
+                output.Append(("Swap R{0} with R{1}", solving_col + 1, best_col_index + 1)).AppendLine();
             }
 
 
@@ -363,14 +402,17 @@ namespace MatrixMath
 
                 //suppose value a is in the top (cur_value)
                 //suppose value b is what needs to be zeroed.
-                //then add b/a
+                //then add, 0 = b + a*(-b/a)
 
                 double inv = val / get_col_val(best_col_index);
 
                 RowLinearMultiple(i + 1, solving_col + 1, inv);
 
-                Console.WriteLine("R{0} = R{0} + R{1}({2})", i + 1, best_col_index + 1, inv);
+                output.Append(("R{0} = R{0} + R{1}({2})", i + 1, best_col_index + 1, inv)).AppendLine();
             }
+
+            if (print)
+                Console.WriteLine(output.ToString());
 
         }
 
