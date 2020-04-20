@@ -17,6 +17,7 @@ namespace MatrixMath
          * Linear Combinations/ Linear Dependence/ Independence
          * 
          * Subroutine that actually spits out x1, x2, x3 solutions to a system
+         * ==> needed for eigenvector computation
          * 
          * Programming in augmented space somehow?
          * 
@@ -32,6 +33,92 @@ namespace MatrixMath
          * 
          * 
          */
+
+        public bool IsEigenvector(Matrix x)
+        {
+            if (IsSquare)
+            {
+                Matrix mult = this * x;
+                double scalefactor = mult[0, 0] / x[0, 0];
+                Matrix check_scale = scalefactor * x;
+                return check_scale.Equals(mult);
+            }
+            throw new Exception();
+        }
+
+        public Matrix CalculateEigenvector(double eigenvalue)
+        {
+            /*
+             * We know (A - lI) = 0
+             * 
+             * 
+             * 
+             */
+            Matrix i = GetIdentityMatrix(Rows);
+            Matrix calc = this - (eigenvalue * i);
+
+            calc.ReducedRowEchelonForm();
+
+            calc.Print();
+
+            calc.PrintSolutions();
+
+            return calc;
+        }
+
+        public void PrintSolutions(bool steps = true)
+        {
+            //a column with a leading-one is not a free variable (basic variable)
+            bool[] basicVariables = new bool[Cols];
+            for(int i = 0; i < Rows; i++)
+            {
+                for(int j = 0; j < Cols; j++)
+                {
+                    double val = this[i, j];
+                    if (val == 1 && basicVariables[i] == false)
+                        basicVariables[i] = true;
+                }
+            }
+
+            char[] freeVariables = new char[Cols];
+
+            int freeCount = 0;
+            for(int i = Cols - 1; i >= 0; i--)
+            {
+                if(basicVariables[i] == false) //a free variable
+                    freeVariables[i] = (char)('s' + Convert.ToChar(freeCount++)); //assign it a name
+            }
+
+            StringBuilder sb = new StringBuilder();
+
+            //go through each row:
+            for (int i = 0; i < Rows; i++)
+            {
+                if (freeVariables[i] != '\0') //a free variable
+                {
+                    sb.AppendFormat("x{0} = {1}", i + 1, freeVariables[i]);
+                    sb.AppendLine();
+                    continue;
+                }
+                sb.AppendFormat("x{0} = ", i + 1);
+                bool settableToZero = true;
+                for (int j = i + 1; j < Cols; j++) //iterate diagonally
+                {
+                    if(this[i,j] != 0)
+                    {
+                        sb.AppendFormat("{0}{1}", -this[i,j], freeVariables[j]);
+                        settableToZero = false;
+                    }
+                }
+                if (settableToZero)
+                    sb.Append("0");
+                sb.AppendLine();
+            }
+
+            if (steps)
+                Console.WriteLine(sb);
+
+        }
 
 
         /// <summary>
@@ -84,24 +171,58 @@ namespace MatrixMath
         public static Matrix operator *(Matrix left, Matrix right)
         {
             int n = left.Rows;
-            int m = right.Cols;
-            int p = left.Cols;
+            int m = left.Cols;
+            int p = right.Cols;
 
-            if (p != right.Rows)
+            if (m != right.Rows)
                 throw new Exception(
-                    string.Format("Cannot multiply a {0}x{1} matrix by a {2}x{3} matrix", n, p, right.Rows, m)
+                    string.Format("Cannot multiply a {0}x{1} matrix by a {2}x{3} matrix", n, m, right.Rows, p)
                 );
 
-            Matrix mult = new Matrix(n, m);
+            Matrix mult = new Matrix(n,p);
 
             for (int i = 0; i < n; i++)
                 for (int j = 0; j < p; j++)
                 {
                     for (int k = 0; k < m; k++)
-                        mult[i, j] += left[i, k] * right[k, j];
+                        mult[i, j] += left[i, k] * right[k,j];
                 }
 
             return mult;
+        }
+
+        public static Matrix operator *(double left, Matrix right)
+        {
+            int n = right.Rows;
+            int m = right.Cols;
+
+            Matrix mult = new Matrix(n, m);
+
+            for (int i = 0; i < n; i++)
+                for (int j = 0; j < m; j++)
+                {
+                    mult[i, j] = left * right[i, j];
+                }
+
+            return mult;
+        }
+
+        public override bool Equals(object obj)
+        {
+            if(obj is Matrix mat)
+            {
+                if (mat.Rows != Rows || mat.Cols != Cols)
+                    return false;
+
+                for (int i = 0; i < Rows; i++)
+                    for (int j = 0; j < Cols; j++)
+                        if (this[i, j] != mat[i, j])
+                            return false;
+
+
+                return true;
+            }
+            return base.Equals(obj);
         }
 
         public double[,] MatrixArray { get; private set; }

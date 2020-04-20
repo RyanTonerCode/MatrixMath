@@ -7,6 +7,72 @@ namespace MatrixMath
 
         static void Main(string[] args)
         {
+            
+            double[,] v1 = new double[,]{
+                { 2, -2, 5},
+                { 0, 3, -2},
+                {0, -1, 2 }
+            };
+            
+            Matrix a = new Matrix(v1);
+
+            a.CalculateEigenvector(1).Print();
+            a.CalculateEigenvector(2).Print();
+            a.CalculateEigenvector(4).Print();
+
+            Console.WriteLine("Problem 6");
+
+            double[,] v2 = new double[,]{
+                { 2, 1},
+                { -2, 5}
+            };
+
+            Matrix b = new Matrix(v2);
+
+            b.CalculateEigenvector(3).Print();
+            b.CalculateEigenvector(4).Print();
+
+            Console.WriteLine("Problem 7");
+
+            double[,] v3 = new double[,]{
+                { -4, 1 ,0},
+                { 0, -4, 0},
+                {0,0, -4 }
+            };
+
+            Matrix c = new Matrix(v3);
+
+            c.CalculateEigenvector(-4).Print();
+
+            Console.WriteLine("Problem 8");
+
+            double[,] v4 = new double[,]{
+                { 8, 0},
+                { 0, -5}
+            };
+
+            Matrix d = new Matrix(v4);
+
+            d.CalculateEigenvector(8).Print();
+
+
+            int x = 5;
+            /*
+            Matrix i = Matrix.GetIdentityMatrix(3);
+
+            double[,] v1 = new double[,]{
+                { 1, 5 },
+                { 2, 10 }
+            };
+
+            Matrix a = new Matrix(v1);
+
+            a.ReducedRowEchelonForm(true);
+
+            a.Print();
+
+            
+
             double[,] v1 = new double[,]{
                 { 2, 4},
                 { 3, 1 },
@@ -48,7 +114,7 @@ namespace MatrixMath
             det = Matrix.Determinant(four, 0);
 
             Console.WriteLine(det);
-
+            */
             Console.ReadLine();
         }
 

@@ -8,7 +8,7 @@
                 this[i, 0] = Input[i, 0];
         }
 
-        public ColumnVector(double[] vector) : base(vector.Length, 1)
+        public ColumnVector(params double[] vector) : base(vector.Length, 1)
         {
             for (int i = 0; i < Rows; i++)
                 this[i, 0] = vector[i];
