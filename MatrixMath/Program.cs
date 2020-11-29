@@ -7,13 +7,66 @@ namespace MatrixMath
 
         static void Main(string[] args)
         {
-            
+
+            /**
+            Matrix A = new Matrix(new double[,]{
+                { 8, -2},
+                { -4, 1}
+            });
+
+            Matrix P = new Matrix(new double[,]{
+                { -2, 1},
+                { 1, 4}
+            });
+
+            Matrix pap = P.GetInverseMatrix() * A * P;
+
+            pap.Print();
+            */
+
+            ColumnVector A = new ColumnVector(new double[] {
+                Math.Sqrt(2)/ 2.0, 0, 0, Math.Sqrt(2)/ 2.0
+            });
+
+            ColumnVector B = new ColumnVector(new double[]{
+                Math.Sqrt(6)/ -6.0, 0, Math.Sqrt(6)/3.0, Math.Sqrt(6)/6.0
+            });
+
+            ColumnVector C = new ColumnVector(new double[]{
+                Math.Sqrt(3)/ -6.0, Math.Sqrt(3)/2.0, Math.Sqrt(3)/ -6.0, Math.Sqrt(3)/ 6.0 
+            });
+
+            ColumnVector V = new ColumnVector(new double[]{
+                1.0, 2.0, 2.0, 1.0 
+            });
+
+            double d1 = V^A;
+            double d2 = V^B;
+            double d3 = V^C;
+
+
+            Matrix Result = (d1 * A) + (d2 * B) + (d3 * C);
+
+
+            Console.WriteLine(d1);
+            Console.WriteLine(d2);
+            Console.WriteLine(d3);
+
+            Result.Print();
+
+
+
+            Console.ReadLine();
+        }
+
+        private static void hwk14()
+        {
             double[,] v1 = new double[,]{
                 { 2, -2, 5},
                 { 0, 3, -2},
                 {0, -1, 2 }
             };
-            
+
             Matrix a = new Matrix(v1);
 
             a.CalculateEigenvector(1).Print();
@@ -54,68 +107,6 @@ namespace MatrixMath
             Matrix d = new Matrix(v4);
 
             d.CalculateEigenvector(8).Print();
-
-
-            int x = 5;
-            /*
-            Matrix i = Matrix.GetIdentityMatrix(3);
-
-            double[,] v1 = new double[,]{
-                { 1, 5 },
-                { 2, 10 }
-            };
-
-            Matrix a = new Matrix(v1);
-
-            a.ReducedRowEchelonForm(true);
-
-            a.Print();
-
-            
-
-            double[,] v1 = new double[,]{
-                { 2, 4},
-                { 3, 1 },
-            };
-
-            Matrix m = new Matrix(v1);
-
-            Console.WriteLine( Matrix.Determinant(m));
-
-            double[,] v2 = new double[,]{
-                {-3, 2, 1},
-                { 4, 6, 5},
-                {2, -3, 1 }
-            };
-
-            Matrix three = new Matrix(v2);
-
-            for (int i = 0; i < 3; i++)
-            {
-                for (int j = 0; j < 3; j++)
-                {
-                    Matrix minor = Matrix.GetMinor(three, i, j);
-
-                    Console.WriteLine("{0} {1} {2}", i, j, Matrix.Determinant(minor));
-                }
-            }
-
-            double det = 1;
-            double k = Math.Sqrt(2);
-            double[,] v3 = new double[,]{
-            {0,k,1 },
-            {k,4,k},
-            {1,k,0}
-            };
-
-            Matrix four = new Matrix(v3);
-
-
-            det = Matrix.Determinant(four, 0);
-
-            Console.WriteLine(det);
-            */
-            Console.ReadLine();
         }
 
         static void p0()
