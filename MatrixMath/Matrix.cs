@@ -49,13 +49,14 @@ namespace MatrixMath
         public Matrix CalculateEigenvector(double eigenvalue)
         {
             /*
-             * We know (A - lI) = 0
+             * From Ax = lx,
+             * We know (A - lI)x = 0
              * 
              * 
              * 
              */
-            Matrix i = GetIdentityMatrix(Rows);
-            Matrix calc = this - (eigenvalue * i);
+            Matrix I = GetIdentityMatrix(Rows);
+            Matrix calc = this - (eigenvalue * I);
 
             calc.ReducedRowEchelonForm();
 
@@ -183,10 +184,8 @@ namespace MatrixMath
 
             for (int i = 0; i < n; i++)
                 for (int j = 0; j < p; j++)
-                {
                     for (int k = 0; k < m; k++)
                         mult[i, j] += left[i, k] * right[k,j];
-                }
 
             return mult;
         }
@@ -200,9 +199,7 @@ namespace MatrixMath
 
             for (int i = 0; i < n; i++)
                 for (int j = 0; j < m; j++)
-                {
                     mult[i, j] = left * right[i, j];
-                }
 
             return mult;
         }
@@ -432,7 +429,7 @@ namespace MatrixMath
             for (int j = 0; j < Cols; j++)
             {
                 output.Append(("COLUMN {0}", j + 1)).AppendLine();
-                ColumnMath(j, rref, print);
+                columnMath(j, rref, print);
 
                 output.Append("=>").AppendLine();
 
@@ -452,7 +449,7 @@ namespace MatrixMath
         }
 
         //start indicates which row to start on
-        private void ColumnMath(int solving_col, bool rref = false, bool print = false)
+        private void columnMath(int solving_col, bool rref = false, bool print = false)
         {
             StringBuilder output = new StringBuilder();
 
@@ -537,6 +534,10 @@ namespace MatrixMath
 
         }
 
+        public override int GetHashCode()
+        {
+            throw new NotImplementedException();
+        }
     }
 }
 
