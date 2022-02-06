@@ -7,6 +7,8 @@ namespace MatrixMath
 
         static void Main(string[] args)
         {
+
+            /**
             Matrix A = new Matrix(new double[,]{
                 { 8, -2},
                 { -4, 1}
@@ -20,6 +22,39 @@ namespace MatrixMath
             Matrix pap = P.GetInverseMatrix() * A * P;
 
             pap.Print();
+            */
+
+            ColumnVector A = new ColumnVector(new double[] {
+                Math.Sqrt(2)/ 2.0, 0, 0, Math.Sqrt(2)/ 2.0
+            });
+
+            ColumnVector B = new ColumnVector(new double[]{
+                Math.Sqrt(6)/ -6.0, 0, Math.Sqrt(6)/3.0, Math.Sqrt(6)/6.0
+            });
+
+            ColumnVector C = new ColumnVector(new double[]{
+                Math.Sqrt(3)/ -6.0, Math.Sqrt(3)/2.0, Math.Sqrt(3)/ -6.0, Math.Sqrt(3)/ 6.0
+            });
+
+            ColumnVector V = new ColumnVector(new double[]{
+                1.0, 2.0, 2.0, 1.0
+            });
+
+            double d1 = V ^ A;
+            double d2 = V ^ B;
+            double d3 = V ^ C;
+
+
+            Matrix Result = (d1 * A) + (d2 * B) + (d3 * C);
+
+
+            Console.WriteLine(d1);
+            Console.WriteLine(d2);
+            Console.WriteLine(d3);
+
+            Result.Print();
+
+
 
             Console.ReadLine();
         }
